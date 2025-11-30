@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import com.example.examplemod.command.ManaCommand;
 import com.example.examplemod.command.PlayerInitCommand;
 import com.example.examplemod.mana.ManaEvents;
+import com.example.examplemod.network.NetworkHandler;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -65,6 +66,8 @@ public class UchihaTM {
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
+
+        NetworkHandler.register(modEventBus);
 
         ManaEvents.register();
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
