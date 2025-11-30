@@ -1,5 +1,7 @@
 package com.example.examplemod.mana;
 
+import java.util.UUID;
+
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -14,21 +16,32 @@ public class ManaEvents {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            ManaManager.getMana(player.getUUID());
+            UUID playerUUID = player.getUUID();
+            // Инициализируем ману
+            ManaManager.getMana(playerUUID);
+            // Загружаем из файла если существует
+            ManaPersistence.loadMana(playerUUID);
         }
     }
 
     @SubscribeEvent
     public static void onPlayerDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            ManaManager.resetMana(player.getUUID());
+            UUID playerUUID = player.getUUID();
+            ManaManager.resetMana(playerUUID);
+            // Сохраняем при смерти
+            ManaPersistence.saveMana(playerUUID, ManaManager.getMana(playerUUID));
         }
     }
 
     @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            ManaManager.removePlayer(player.getUUID());
+            UUID playerUUID = player.getUUID();
+            // Сохраняем перед выходом
+            ManaPersistence.saveMana(playerUUID, ManaManager.getMana(playerUUID));
+            // Удаляем из памяти
+            ManaManager.removePlayer(playerUUID);
         }
     }
 
