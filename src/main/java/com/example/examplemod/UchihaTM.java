@@ -3,6 +3,7 @@ package com.example.examplemod;
 import org.slf4j.Logger;
 
 import com.example.examplemod.command.ManaCommand;
+import com.example.examplemod.command.PlayerInitCommand;
 import com.example.examplemod.mana.ManaEvents;
 import com.mojang.logging.LogUtils;
 
