@@ -1,4 +1,4 @@
-package com.example.examplemod.network;
+package com.example.examplemod.client;
 
 public class ManaHUDClientData {
     private static int clientMana = 0;

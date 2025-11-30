@@ -21,7 +21,10 @@ public class ManaHUD {
             return;
         }
 
-        String manaText = "50/100";
+        int currentMana = ManaHUDClientData.getCurrentMana();
+        int maxMana = ManaHUDClientData.getMaxMana();
+        String manaText = currentMana + "/" + maxMana;
+
         GuiGraphics guiGraphics = event.getGuiGraphics();
         guiGraphics.drawString(minecraft.font, manaText, 10, 10, 0xFFFFFF, false);
     }

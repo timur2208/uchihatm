@@ -36,6 +36,7 @@ public class ManaCommand {
                                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                                     ManaData mana = ManaEvents.getManaData(player);
                                                     mana.setCurrentMana(value);
+                                                    ManaEvents.syncMana(player);
                                                     context.getSource().sendSuccess(
                                                             () -> Component.literal("§6Мана установлена: §f" + mana.getCurrentMana() + "/" + mana.getMaxMana()),
                                                             false
@@ -51,6 +52,7 @@ public class ManaCommand {
                                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                                     ManaData mana = ManaEvents.getManaData(player);
                                                     mana.addMana(value);
+                                                    ManaEvents.syncMana(player);
                                                     context.getSource().sendSuccess(
                                                             () -> Component.literal("§6Мана изменена: §f" + mana.getCurrentMana() + "/" + mana.getMaxMana()),
                                                             false

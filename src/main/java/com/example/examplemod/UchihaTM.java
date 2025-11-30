@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 
 import com.example.examplemod.command.ManaCommand;
 import com.example.examplemod.mana.ManaEvents;
+import com.example.examplemod.network.ClientPayloadHandler;
+import com.example.examplemod.network.ManaDataPayload;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,31 +31,28 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-// Главный класс мода
 @Mod(UchihaTM.MODID)
 public class UchihaTM {
     public static final String MODID = "uchihatm";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    // Регистраторы блоков, предметов и табов
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
     public static final DeferredRegister CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
-    // Пример блока
     public static final DeferredBlock EXAMPLE_BLOCK = BLOCKS.registerSimpleBlock("example_block", BlockBehaviour.Properties.of().mapColor(MapColor.STONE));
     public static final DeferredItem EXAMPLE_BLOCK_ITEM = ITEMS.registerSimpleBlockItem("example_block", EXAMPLE_BLOCK);
 
-    // Пример предмета (еда)
     public static final DeferredItem EXAMPLE_ITEM = ITEMS.registerSimpleItem("example_item", new Item.Properties().food(new FoodProperties.Builder()
             .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
 
-    // Креатив таб
     public static final DeferredHolder EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.uchihatm"))
             .withTabsBefore(CreativeModeTabs.COMBAT)
@@ -63,22 +62,18 @@ public class UchihaTM {
             }).build());
 
     public UchihaTM(IEventBus modEventBus, ModContainer modContainer) {
-        // Регистраторы
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        // Общие события
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
+        modEventBus.addListener(this::registerPayloads);
 
-        // Событие маны
         ManaEvents.register();
 
-        // Событие команд
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
 
-        // Конфиг
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
@@ -95,6 +90,11 @@ public class UchihaTM {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(EXAMPLE_BLOCK_ITEM);
         }
+    }
+
+    private void registerPayloads(RegisterPayloadHandlersEvent event) {
+        IPayloadRegistrar registrar = event.registrar("1");
+        registrar.playToClient(ManaDataPayload.ID, ManaDataPayload.CODEC, ClientPayloadHandler::handleManaData);
     }
 
     private void registerCommands(RegisterCommandsEvent event) {

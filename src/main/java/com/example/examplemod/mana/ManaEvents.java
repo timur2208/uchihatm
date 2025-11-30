@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import com.example.examplemod.network.ManaDataPayload;
+
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * Обработчик событий маны
@@ -25,6 +28,7 @@ public class ManaEvents {
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             ManaData mana = getManaData(player);
+            syncMana(player);
         }
     }
 
@@ -33,6 +37,7 @@ public class ManaEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             ManaData mana = getManaData(player);
             mana.reset();
+            syncMana(player);
         }
     }
 
@@ -41,6 +46,12 @@ public class ManaEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             playerManaMap.remove(player.getUUID());
         }
+    }
+
+    public static void syncMana(ServerPlayer player) {
+        ManaData mana = getManaData(player);
+        ManaDataPayload payload = new ManaDataPayload(mana.getCurrentMana(), mana.getMaxMana());
+        PacketDistributor.sendToPlayer(payload, player);
     }
 
     public static void register() {
