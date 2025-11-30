@@ -2,15 +2,11 @@ package com.example.examplemod.network;
 
 import java.util.function.Supplier;
 
-import com.example.examplemod.mana.ManaData;
-import com.example.examplemod.mana.ManaEvents;
+import com.example.examplemod.client.ManaHUDClientData;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.network.codec.StreamCodec;
-import net.neoforged.neoforge.network.NetworkEvent;
 import io.netty.buffer.ByteBuf;
+import net.neoforged.neoforge.network.codec.StreamCodec;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record ManaDataSyncPacket(int currentMana, int maxMana) {
     public static final StreamCodec<ByteBuf, ManaDataSyncPacket> CODEC = StreamCodec.of(
@@ -23,8 +19,10 @@ public record ManaDataSyncPacket(int currentMana, int maxMana) {
 
     public static void handle(ManaDataSyncPacket packet, Supplier<IPayloadContext> context) {
         context.get().enqueueWork(() -> {
-            // Обновляем клиентское значение
             ManaHUDClientData.setMana(packet.currentMana, packet.maxMana);
+        }).exceptionally(ex -> {
+            context.get().disconnect();
+            return null;
         });
     }
 }
