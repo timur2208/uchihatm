@@ -31,12 +31,12 @@ public class ManaCommand {
                                         })
                                 )
                                 .then(Commands.literal("set")
+                                        .requires(source -> source.hasPermission(2))
                                         .then(Commands.argument("value", IntegerArgumentType.integer(0, 1000))
                                                 .executes(context -> {
                                                     int value = IntegerArgumentType.getInteger(context, "value");
                                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                                     ManaManager.getMana(player.getUUID()).setCurrentMana(value);
-                                                    // Сохраняем после изменения
                                                     ManaPersistence.saveMana(player.getUUID(), ManaManager.getMana(player.getUUID()));
                                                     int current = ManaManager.getCurrentMana(player.getUUID());
                                                     int max = ManaManager.getMaxMana(player.getUUID());
@@ -49,12 +49,12 @@ public class ManaCommand {
                                         )
                                 )
                                 .then(Commands.literal("add")
+                                        .requires(source -> source.hasPermission(2))
                                         .then(Commands.argument("value", IntegerArgumentType.integer(-1000, 1000))
                                                 .executes(context -> {
                                                     int value = IntegerArgumentType.getInteger(context, "value");
                                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                                     ManaManager.addMana(player.getUUID(), value);
-                                                    // Сохраняем после изменения
                                                     ManaPersistence.saveMana(player.getUUID(), ManaManager.getMana(player.getUUID()));
                                                     int current = ManaManager.getCurrentMana(player.getUUID());
                                                     int max = ManaManager.getMaxMana(player.getUUID());

@@ -88,6 +88,7 @@ public class UchihaTM {
 
     private void registerCommands(RegisterCommandsEvent event) {
         ManaCommand.register(event.getDispatcher());
+        PlayerInitCommand.register(event.getDispatcher());
         LOGGER.info("Мана-команды зарегистрированы");
     }
 
