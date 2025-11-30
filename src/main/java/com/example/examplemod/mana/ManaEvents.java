@@ -17,8 +17,14 @@ public class ManaEvents {
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             UUID playerUUID = player.getUUID();
+
+            // ВАЖНО: Очищаем ман из памяти ПРИ ВХОДЕ
+            // Это гарантирует что файл загрузится заново
+            ManaManager.removePlayer(playerUUID);
+
             // Инициализируем ману
             ManaManager.getMana(playerUUID);
+
             // Загружаем из файла ЭТОГО МИРА если существует
             ManaPersistence.loadMana(playerUUID, player);
         }
