@@ -14,7 +14,6 @@ public class ManaEvents {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            // Инициализируем ману при входе (если её нет)
             ManaManager.getMana(player.getUUID());
         }
     }
@@ -35,5 +34,6 @@ public class ManaEvents {
 
     public static void register() {
         NeoForge.EVENT_BUS.register(ManaEvents.class);
+        ManaTickEvent.register();
     }
 }
