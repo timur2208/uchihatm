@@ -57,9 +57,9 @@ public class UchihaTM {
     public static final DeferredHolder EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.uchihatm"))
             .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> EXAMPLE_ITEM)
+            .icon(() -> new ItemStack(EXAMPLE_ITEM.value()))
             .displayItems((parameters, output) -> {
-                output.accept(EXAMPLE_ITEM);
+                output.accept(EXAMPLE_ITEM.value());
             }).build());
 
     public UchihaTM(IEventBus modEventBus, ModContainer modContainer) {
