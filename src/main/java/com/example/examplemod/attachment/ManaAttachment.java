@@ -1,6 +1,9 @@
 package com.example.examplemod.attachment;
 
-public class ManaAttachment {
+import net.minecraft.nbt.CompoundTag;
+import net.neoforged.neoforge.attachment.INBTSerializable;
+
+public class ManaAttachment implements INBTSerializable<CompoundTag> {
     private int currentMana = 50;
     private int maxMana = 100;
 
@@ -22,5 +25,19 @@ public class ManaAttachment {
 
     public void reset() {
         currentMana = 0;
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("currentMana", currentMana);
+        tag.putInt("maxMana", maxMana);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag nbt) {
+        currentMana = nbt.getInt("currentMana");
+        maxMana = nbt.getInt("maxMana");
     }
 }
