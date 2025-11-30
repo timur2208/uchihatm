@@ -1,13 +1,27 @@
 package com.example.examplemod.network;
 
-import com.example.examplemod.client.ManaHUD;
 import net.minecraft.network.FriendlyByteBuf;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+
+import com.example.examplemod.UchihaTM;
+import com.example.examplemod.client.ManaHUD;
 
 /**
  * Пакет для синхронизации маны с клиентом
  */
-public class ManaClientSyncPacket {
+public class ManaClientSyncPacket implements CustomPacketPayload {
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(UchihaTM.MODID, "mana_sync");
+
+    public static final StreamCodec<FriendlyByteBuf, ManaClientSyncPacket> CODEC = StreamCodec.composite(
+            FriendlyByteBuf::readInt,
+            packet -> packet.currentMana,
+            FriendlyByteBuf::readInt,
+            packet -> packet.maxMana,
+            ManaClientSyncPacket::new
+    );
+
     private final int currentMana;
     private final int maxMana;
 
@@ -16,21 +30,8 @@ public class ManaClientSyncPacket {
         this.maxMana = maxMana;
     }
 
-    public ManaClientSyncPacket(FriendlyByteBuf buf) {
-        this.currentMana = buf.readInt();
-        this.maxMana = buf.readInt();
-    }
-
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(currentMana);
-        buf.writeInt(maxMana);
-    }
-
-    public void handle(PlayPayloadContext context) {
-        context.enqueueWork(() -> {
-            // Обновляем HUD на клиенте
-            ManaHUD.clientMana = currentMana;
-            ManaHUD.clientMaxMana = maxMana;
-        });
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 }

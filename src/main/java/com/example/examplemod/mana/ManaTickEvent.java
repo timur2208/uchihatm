@@ -25,11 +25,9 @@ public class ManaTickEvent {
             for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
                 UUID playerUUID = player.getUUID();
 
-                // Получаем текущее измерение
                 String currentDimension = player.serverLevel().dimension().location().toString();
                 String lastDimension = playerLastDimension.getOrDefault(playerUUID, "");
 
-                // Если игрок сменил измерение
                 if (!currentDimension.equals(lastDimension)) {
                     ManaManager.removePlayer(playerUUID);
                     ManaManager.getMana(playerUUID);
@@ -37,15 +35,13 @@ public class ManaTickEvent {
                     playerLastDimension.put(playerUUID, currentDimension);
                 }
 
-                // Обновляем регенерацию маны
                 ManaManager.getMana(playerUUID).updateRegen();
 
-                // Каждые 20 тиков (1 сек) отправляем пакет клиенту
                 if (tickCounter % 20 == 0) {
                     int current = ManaManager.getCurrentMana(playerUUID);
                     int max = ManaManager.getMaxMana(playerUUID);
                     ManaClientSyncPacket packet = new ManaClientSyncPacket(current, max);
-                    PacketDistributor.PLAYER.with(player).send(packet);
+                    PacketDistributor.sendToPlayer(packet, player);
                 }
             }
             tickCounter++;
