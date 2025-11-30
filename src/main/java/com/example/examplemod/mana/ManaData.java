@@ -1,14 +1,29 @@
 package com.example.examplemod.mana;
 
 /**
- * Данные маны одного игрока
+ * Данные маны игрока
  */
 public class ManaData {
-    private int currentMana = 50;
-    private int maxMana = 100;
-    private long lastRegenTime = System.currentTimeMillis();
-    private static final int REGEN_AMOUNT = 1; // Маны за раз
-    private static final long REGEN_INTERVAL = 1000; // 1 сек между регенерацией (мс)
+    private int currentMana;
+    private int maxMana;
+    private int regenTicks = 0;
+    private static final int REGEN_INTERVAL = 10; // регенерируем каждые 10 тиков
+
+    /**
+     * Конструктор без параметров (по умолчанию)
+     */
+    public ManaData() {
+        this.currentMana = 0;
+        this.maxMana = 0;
+    }
+
+    /**
+     * Конструктор с параметрами
+     */
+    public ManaData(int currentMana, int maxMana) {
+        this.currentMana = currentMana;
+        this.maxMana = maxMana;
+    }
 
     public int getCurrentMana() {
         return currentMana;
@@ -18,39 +33,34 @@ public class ManaData {
         this.currentMana = Math.max(0, Math.min(mana, maxMana));
     }
 
-    public void addMana(int amount) {
-        setCurrentMana(currentMana + amount);
-    }
-
     public int getMaxMana() {
         return maxMana;
     }
 
     public void setMaxMana(int max) {
-        this.maxMana = Math.max(1, max);
+        this.maxMana = max;
         if (currentMana > maxMana) {
             currentMana = maxMana;
         }
     }
 
-    public void reset() {
-        currentMana = 0;
+    /**
+     * Добавить ман
+     */
+    public void addMana(int amount) {
+        setCurrentMana(currentMana + amount);
     }
 
     /**
-     * Обновить регенерацию маны
-     * Вызывается каждый тик сервера (20 раз в сек)
+     * Обновить регенерацию (вызывается каждый тик)
      */
     public void updateRegen() {
-        long currentTime = System.currentTimeMillis();
-
-        // Проверяем, прошла ли достаточно времени для регенерации
-        if (currentTime - lastRegenTime >= REGEN_INTERVAL) {
-            // Если ман не полная, восстанавливаем
+        regenTicks++;
+        if (regenTicks >= REGEN_INTERVAL) {
+            regenTicks = 0;
             if (currentMana < maxMana) {
-                addMana(REGEN_AMOUNT);
+                currentMana++;
             }
-            lastRegenTime = currentTime;
         }
     }
 }
