@@ -14,11 +14,11 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -57,9 +57,9 @@ public class UchihaTM {
     public static final DeferredHolder EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.uchihatm"))
             .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> EXAMPLE_ITEM.get().getDefaultInstance())
+            .icon(() -> new ItemStack(EXAMPLE_ITEM.get()))
             .displayItems((parameters, output) -> {
-                output.accept(EXAMPLE_ITEM.get());
+                output.accept(new ItemStack(EXAMPLE_ITEM.get()));
             }).build());
 
     public UchihaTM(IEventBus modEventBus, ModContainer modContainer) {
@@ -73,7 +73,7 @@ public class UchihaTM {
         modEventBus.addListener(this::addCreative);
 
         // Событие маны
-        NeoForge.EVENT_BUS.register(ManaEvents.class);
+        ManaEvents.register();
 
         // Событие команд
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
@@ -105,14 +105,5 @@ public class UchihaTM {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         LOGGER.info("HELLO from server starting");
-    }
-
-    // Клиентские события
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientEvents {
-        @SubscribeEvent
-        public static void onClientSetup(FMLCommonSetupEvent event) {
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-        }
     }
 }

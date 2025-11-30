@@ -5,16 +5,14 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 /**
  * Обработчик событий маны
  */
-@EventBusSubscriber(modid = "uchihatm", bus = EventBusSubscriber.Bus.NEOFORGE)
 public class ManaEvents {
 
     // Хранилище маны для каждого игрока по UUID
@@ -33,10 +31,7 @@ public class ManaEvents {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            // Получаем или создаём ManaData
             ManaData mana = getManaData(player);
-            // Можно добавить логирование
-            // UchihaTM.LOGGER.info("Игрок {} вошёл, мана: {}/{}", player.getName().getString(), mana.getCurrentMana(), mana.getMaxMana());
         }
     }
 
@@ -52,12 +47,17 @@ public class ManaEvents {
     }
 
     /**
-     * Событие при выходе игрока — удаляем его ману из памяти (опционально)
+     * Событие при выходе игрока — удаляем его ману из памяти
      */
     @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             playerManaMap.remove(player.getUUID());
         }
+    }
+
+    // Регистрация событий
+    public static void register() {
+        NeoForge.EVENT_BUS.register(ManaEvents.class);
     }
 }
