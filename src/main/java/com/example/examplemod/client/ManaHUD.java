@@ -15,9 +15,6 @@ import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 @EventBusSubscriber(modid = UchihaTM.MODID, value = Dist.CLIENT)
 public class ManaHUD {
 
-    private static int clientMana = 50;
-    private static int clientMaxMana = 100;
-
     /**
      * Событие рендеринга GUI — рисуем ману сверху слева
      */
@@ -30,10 +27,11 @@ public class ManaHUD {
             return;
         }
 
-        String manaText = clientMana + "/" + clientMaxMana;
-        GuiGraphics guiGraphics = event.getGuiGraphics();
+        int currentMana = ManaHUDClientData.getCurrentMana();
+        int maxMana = ManaHUDClientData.getMaxMana();
+        String manaText = currentMana + "/" + maxMana;
 
-        // Рисуем текст в левом верхнем углу (позиция 10, 10) белым цветом (0xFFFFFF)
+        GuiGraphics guiGraphics = event.getGuiGraphics();
         guiGraphics.drawString(minecraft.font, manaText, 10, 10, 0xFFFFFF, false);
     }
 }
