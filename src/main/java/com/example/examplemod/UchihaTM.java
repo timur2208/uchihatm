@@ -2,9 +2,8 @@ package com.example.examplemod;
 
 import org.slf4j.Logger;
 
-import com.example.examplemod.attachment.ManaAttachmentHandler;
-import com.example.examplemod.attachment.ManaAttachments;
 import com.example.examplemod.command.ManaCommand;
+import com.example.examplemod.mana.ManaEvents;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -63,12 +62,10 @@ public class UchihaTM {
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        ManaAttachments.register(modEventBus);
-
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
 
-        NeoForge.EVENT_BUS.register(ManaAttachmentHandler.class);
+        ManaEvents.register();
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
