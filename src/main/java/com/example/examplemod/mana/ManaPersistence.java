@@ -11,21 +11,35 @@ import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * Сохранение и загрузка маны в JSON файл (отдельно для каждого мира)
+ * Сохранение и загрузка маны в JSON файл (отдельно для каждого мира/сервера)
  */
 public class ManaPersistence {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final String MANA_DIR = "mana_data";
+
+    /**
+     * Получить корневую папку маны (отдельная для каждого сервера)
+     */
+    private static File getManaRootDir() {
+        // Используем имя сервера или worldname как идентификатор
+        // Это гарантирует что разные серверы имеют разные папки
+        File worldDir = new File(".");
+        String serverName = System.getProperty("server.name", "default");
+
+        File manaDir = new File(worldDir, "mana_data_" + serverName);
+        if (!manaDir.exists()) {
+            manaDir.mkdirs();
+        }
+        return manaDir;
+    }
 
     /**
      * Получить путь к файлу маны игрока (с учётом мира)
      */
     private static File getManaFile(UUID playerUUID, ServerPlayer player) {
-        // Создаём папку мира: mana_data/dimension_name/
         String dimensionName = player.serverLevel().dimension().location().toString()
-                .replace(":", "_"); // minecraft:overworld -> minecraft_overworld
+                .replace(":", "_");
 
-        File dimensionDir = new File(MANA_DIR, dimensionName);
+        File dimensionDir = new File(getManaRootDir(), dimensionName);
         if (!dimensionDir.exists()) {
             dimensionDir.mkdirs();
         }
@@ -34,7 +48,7 @@ public class ManaPersistence {
     }
 
     /**
-     * Сохранить ману в файл (для конкретного мира)
+     * Сохранить ману в файл
      */
     public static void saveMana(UUID playerUUID, ManaData mana, ServerPlayer player) {
         try {
@@ -51,7 +65,7 @@ public class ManaPersistence {
     }
 
     /**
-     * Загрузить ману из файла (для конкретного мира)
+     * Загрузить ману из файла
      */
     public static void loadMana(UUID playerUUID, ServerPlayer player) {
         try {
