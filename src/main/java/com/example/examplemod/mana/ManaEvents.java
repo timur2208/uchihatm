@@ -17,15 +17,7 @@ public class ManaEvents {
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             UUID playerUUID = player.getUUID();
-
-            // ВАЖНО: Очищаем ман из памяти ПРИ ВХОДЕ
-            // Это гарантирует что файл загрузится заново
-            ManaManager.removePlayer(playerUUID);
-
-            // Инициализируем ману
-            ManaManager.getMana(playerUUID);
-
-            // Загружаем из файла ЭТОГО МИРА если существует
+            // НЕ создаём новую ман, только загружаем если существует
             ManaPersistence.loadMana(playerUUID, player);
         }
     }
@@ -35,7 +27,6 @@ public class ManaEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             UUID playerUUID = player.getUUID();
             ManaManager.resetMana(playerUUID);
-            // Сохраняем при смерти в этот мир
             ManaPersistence.saveMana(playerUUID, ManaManager.getMana(playerUUID), player);
         }
     }
@@ -44,9 +35,7 @@ public class ManaEvents {
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             UUID playerUUID = player.getUUID();
-            // Сохраняем перед выходом в этот мир
             ManaPersistence.saveMana(playerUUID, ManaManager.getMana(playerUUID), player);
-            // Удаляем из памяти
             ManaManager.removePlayer(playerUUID);
         }
     }

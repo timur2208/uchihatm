@@ -10,6 +10,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 
 @EventBusSubscriber(modid = UchihaTM.MODID, value = Dist.CLIENT)
 public class ManaHUD {
@@ -18,15 +19,20 @@ public class ManaHUD {
     private static final int BAR_HEIGHT = 60;
     private static final int PADDING = 10;
 
-    public static int clientMana = 50;
-    public static int clientMaxMana = 100;
-
     @SubscribeEvent
     public static void onRenderGuiLayer(RenderGuiLayerEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
 
         if (player == null) {
+            return;
+        }
+
+        int current = ManaManager.getCurrentMana(player.getUUID());
+        int max = ManaManager.getMaxMana(player.getUUID());
+
+        // Если ман 0 и максимум 0 — игрок не инициализирован, не рисуем полосу
+        if (current == 0 && max == 0) {
             return;
         }
 
@@ -38,13 +44,13 @@ public class ManaHUD {
         guiGraphics.fill(x - 1, y - 1, x + BAR_WIDTH + 1, y + BAR_HEIGHT + 1, 0xFF000000);
         guiGraphics.fill(x, y, x + BAR_WIDTH, y + BAR_HEIGHT, 0xFF4B4B4B);
 
-        int filledHeight = (int) ((float) clientMana / clientMaxMana * BAR_HEIGHT);
-        int color = interpolateColor(clientMana, clientMaxMana);
+        int filledHeight = (int) ((float) current / max * BAR_HEIGHT);
+        int color = interpolateColor(current, max);
 
         int fillStartY = y + BAR_HEIGHT - filledHeight;
         guiGraphics.fill(x, fillStartY, x + BAR_WIDTH, y + BAR_HEIGHT, color);
 
-        String manaText = "М: " + clientMana + "/" + clientMaxMana;
+        String manaText = "М: " + current + "/" + max;
         guiGraphics.drawString(minecraft.font, manaText, x + BAR_WIDTH + 5, y, 0xFFFFFF, false);
     }
 
