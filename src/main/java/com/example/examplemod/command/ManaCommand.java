@@ -18,7 +18,6 @@ public class ManaCommand {
         dispatcher.register(
                 Commands.literal("uchihatm")
                         .then(Commands.literal("mana")
-                                // /uchihatm mana get [игрок]
                                 .then(Commands.literal("get")
                                         .executes(context -> {
                                             ServerPlayer player = context.getSource().getPlayerOrException();
@@ -30,7 +29,6 @@ public class ManaCommand {
                                             return 1;
                                         })
                                 )
-                                // /uchihatm mana set <значение>
                                 .then(Commands.literal("set")
                                         .then(Commands.argument("value", IntegerArgumentType.integer(0, 1000))
                                                 .executes(context -> {
@@ -38,7 +36,6 @@ public class ManaCommand {
                                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                                     ManaData mana = ManaEvents.getManaData(player);
                                                     mana.setCurrentMana(value);
-                                                    ManaEvents.syncMana(player);
                                                     context.getSource().sendSuccess(
                                                             () -> Component.literal("§6Мана установлена: §f" + mana.getCurrentMana() + "/" + mana.getMaxMana()),
                                                             false
@@ -47,7 +44,6 @@ public class ManaCommand {
                                                 })
                                         )
                                 )
-                                // /uchihatm mana add <значение>
                                 .then(Commands.literal("add")
                                         .then(Commands.argument("value", IntegerArgumentType.integer(-1000, 1000))
                                                 .executes(context -> {
@@ -55,7 +51,6 @@ public class ManaCommand {
                                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                                     ManaData mana = ManaEvents.getManaData(player);
                                                     mana.addMana(value);
-                                                    ManaEvents.syncMana(player);
                                                     context.getSource().sendSuccess(
                                                             () -> Component.literal("§6Мана изменена: §f" + mana.getCurrentMana() + "/" + mana.getMaxMana()),
                                                             false

@@ -9,7 +9,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * Обработчик событий маны
@@ -26,7 +25,6 @@ public class ManaEvents {
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             ManaData mana = getManaData(player);
-            syncMana(player);
         }
     }
 
@@ -35,7 +33,6 @@ public class ManaEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             ManaData mana = getManaData(player);
             mana.reset();
-            syncMana(player);
         }
     }
 
@@ -44,12 +41,6 @@ public class ManaEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             playerManaMap.remove(player.getUUID());
         }
-    }
-
-    public static void syncMana(ServerPlayer player) {
-        ManaData mana = getManaData(player);
-        // TODO: отправить пакет синхронизации
-        // Пока пусто, добавим после регистрации сети
     }
 
     public static void register() {
