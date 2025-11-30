@@ -1,7 +1,7 @@
 package com.example.examplemod.client;
 
 import com.example.examplemod.UchihaTM;
-import com.example.examplemod.attachment.ManaAttachments;
+import com.example.examplemod.mana.ManaManager;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,8 +23,10 @@ public class ManaHUD {
             return;
         }
 
-        var manaData = player.getData(ManaAttachments.MANA);
-        String manaText = manaData.getCurrentMana() + "/" + manaData.getMaxMana();
+        // Читаем текущее значение из ManaManager
+        int current = ManaManager.getCurrentMana(player.getUUID());
+        int max = ManaManager.getMaxMana(player.getUUID());
+        String manaText = current + "/" + max;
 
         GuiGraphics guiGraphics = event.getGuiGraphics();
         guiGraphics.drawString(minecraft.font, manaText, 10, 10, 0xFFFFFF, false);
