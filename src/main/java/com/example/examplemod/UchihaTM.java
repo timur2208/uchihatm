@@ -2,10 +2,9 @@ package com.example.examplemod;
 
 import org.slf4j.Logger;
 
+import com.example.examplemod.attachment.ManaAttachmentHandler;
+import com.example.examplemod.attachment.ManaAttachments;
 import com.example.examplemod.command.ManaCommand;
-import com.example.examplemod.mana.ManaEvents;
-import com.example.examplemod.network.ClientPayloadHandler;
-import com.example.examplemod.network.ManaDataPayload;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -31,8 +30,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -66,12 +63,12 @@ public class UchihaTM {
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
+        ManaAttachments.register(modEventBus);
+
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
-        modEventBus.addListener(this::registerPayloads);
 
-        ManaEvents.register();
-
+        NeoForge.EVENT_BUS.register(ManaAttachmentHandler.class);
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -90,11 +87,6 @@ public class UchihaTM {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(EXAMPLE_BLOCK_ITEM);
         }
-    }
-
-    private void registerPayloads(RegisterPayloadHandlersEvent event) {
-        IPayloadRegistrar registrar = event.registrar("1");
-        registrar.playToClient(ManaDataPayload.ID, ManaDataPayload.CODEC, ClientPayloadHandler::handleManaData);
     }
 
     private void registerCommands(RegisterCommandsEvent event) {
