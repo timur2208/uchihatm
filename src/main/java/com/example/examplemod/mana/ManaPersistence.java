@@ -12,7 +12,6 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Сохранение и загрузка маны в JSON файл
- * Каждый сервер имеет уникальную папку на основе level.dat
  */
 public class ManaPersistence {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -26,16 +25,13 @@ public class ManaPersistence {
                     .resolve("level.dat").toFile();
 
             if (levelDat.exists()) {
-                // Используем абсолютный путь как уникальный идентификатор
                 String absolutePath = levelDat.getAbsolutePath();
-                // Берём хеш пути
                 return String.format("%08x", absolutePath.hashCode());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // Fallback: используем имя мира
         return player.getServer().getWorldData().getLevelName();
     }
 
@@ -44,8 +40,6 @@ public class ManaPersistence {
      */
     private static File getManaServerDir(ServerPlayer player) {
         String serverHash = getServerHash(player);
-
-        // Создаём папку: mana_data/<server_hash>/
         File manaDir = new File("mana_data", serverHash);
         if (!manaDir.exists()) {
             manaDir.mkdirs();
@@ -70,6 +64,7 @@ public class ManaPersistence {
             json.addProperty("uuid", playerUUID.toString());
             json.addProperty("currentMana", mana.getCurrentMana());
             json.addProperty("maxMana", mana.getMaxMana());
+            json.addProperty("initialized", ManaManager.isInitialized(playerUUID));
 
             File file = getManaFile(playerUUID, player);
             Files.write(file.toPath(), GSON.toJson(json).getBytes());
@@ -90,10 +85,14 @@ public class ManaPersistence {
 
                 int currentMana = json.get("currentMana").getAsInt();
                 int maxMana = json.get("maxMana").getAsInt();
+                boolean initialized = json.has("initialized") && json.get("initialized").getAsBoolean();
 
-                ManaData mana = ManaManager.getMana(playerUUID);
-                mana.setCurrentMana(currentMana);
-                mana.setMaxMana(maxMana);
+                if (initialized) {
+                    ManaManager.initializePlayer(playerUUID);
+                    ManaData mana = ManaManager.getMana(playerUUID);
+                    mana.setCurrentMana(currentMana);
+                    mana.setMaxMana(maxMana);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

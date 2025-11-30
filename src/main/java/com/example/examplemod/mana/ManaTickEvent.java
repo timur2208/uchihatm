@@ -18,8 +18,10 @@ public class ManaTickEvent {
             for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
                 UUID playerUUID = player.getUUID();
 
-                // Обновляем регенерацию маны
-                ManaManager.getMana(playerUUID).updateRegen();
+                // Регенерируем ман ТОЛЬКО для инициализированных игроков
+                if (ManaManager.isInitialized(playerUUID)) {
+                    ManaManager.getMana(playerUUID).updateRegen();
+                }
             }
         }
     }

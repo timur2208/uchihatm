@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * Команда для инициализации игрока в системе мода
+ * Команда для инициализации игрока
  */
 public class PlayerInitCommand {
 
@@ -25,13 +25,13 @@ public class PlayerInitCommand {
                                             ServerPlayer targetPlayer = EntityArgument.getPlayer(context, "player");
                                             UUID playerUUID = targetPlayer.getUUID();
 
-                                            // Инициализируем ману (50/100)
-                                            ManaManager.getMana(playerUUID).setCurrentMana(50);
+                                            // Инициализируем игрока
+                                            ManaManager.initializePlayer(playerUUID);
 
-                                            // Сохраняем в файл ЭТОГО МИРА
+                                            // Сохраняем в файл
                                             ManaPersistence.saveMana(playerUUID, ManaManager.getMana(playerUUID), targetPlayer);
 
-                                            // Сообщение администратору
+                                            // Сообщение админу
                                             context.getSource().sendSuccess(
                                                     () -> Component.literal("§6✓ Игрок §f" + targetPlayer.getName().getString() +
                                                             "§6 инициализирован! Ман: §f50/100"),
