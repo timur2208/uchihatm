@@ -1,0 +1,13 @@
+{
+  "itemGroup.uchihatm": "Example Mod Tab",
+  "block.uchihatm.example_block": "Example Block",
+  "item.uchihatm.example_item": "Example Item",
+
+  "uchihatm.configuration.title": "Uchiha TM Configs",
+  "uchihatm.configuration.section.uchihatm.common.toml": "Uchiha TM Configs",
+  "uchihatm.configuration.section.uchihatm.common.toml.title": "Uchiha TM Configs",
+  "uchihatm.configuration.items": "Item List",
+  "uchihatm.configuration.logDirtBlock": "Log Dirt Block",
+  "uchihatm.configuration.magicNumberIntroduction": "Magic Number Text",
+  "uchihatm.configuration.magicNumber": "Magic Number"
+}
