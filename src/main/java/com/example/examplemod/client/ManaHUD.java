@@ -12,7 +12,7 @@ import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 /**
  * Клиентский HUD для отображения маны
  */
-@EventBusSubscriber(modid = UchihaTM.MODID, bus = EventBusSubscriber.Bus.NEOFORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = UchihaTM.MODID, value = Dist.CLIENT)
 public class ManaHUD {
 
     private static int clientMana = 50;
