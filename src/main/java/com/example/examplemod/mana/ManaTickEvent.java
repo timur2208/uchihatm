@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.api.distmarker.Dist;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -15,7 +14,6 @@ public class ManaTickEvent {
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Pre event) {
-        // Обновляем регенерацию маны для всех игроков на сервере
         if (event.getServer() != null) {
             for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
                 UUID playerUUID = player.getUUID();
