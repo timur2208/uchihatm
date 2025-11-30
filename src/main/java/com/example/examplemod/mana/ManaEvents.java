@@ -1,39 +1,29 @@
 package com.example.examplemod.mana;
 
+import java.util.UUID;
+
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
- * Обработчик событий маны
+ * Обработчик тиков сервера для регенерации маны
  */
-public class ManaEvents {
+public class ManaTickEvent {
 
     @SubscribeEvent
-    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            ManaManager.getMana(player.getUUID());
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerDeath(LivingDeathEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            ManaManager.resetMana(player.getUUID());
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            ManaManager.removePlayer(player.getUUID());
+    public static void onServerTick(ServerTickEvent.Pre event) {
+        // Обновляем регенерацию маны для всех игроков на сервере
+        if (event.getServer() != null) {
+            for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
+                UUID playerUUID = player.getUUID();
+                ManaManager.getMana(playerUUID).updateRegen();
+            }
         }
     }
 
     public static void register() {
-        NeoForge.EVENT_BUS.register(ManaEvents.class);
-        ManaTickEvent.register();
+        NeoForge.EVENT_BUS.register(ManaTickEvent.class);
     }
 }
