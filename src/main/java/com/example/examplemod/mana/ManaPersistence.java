@@ -11,21 +11,21 @@ import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * Сохранение и загрузка маны в JSON файл (отдельно для каждого мира/сервера)
+ * Сохранение и загрузка маны в JSON файл
+ * Каждый мир (сервер) имеет одну общую ман для всех игроков
  */
 public class ManaPersistence {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     /**
-     * Получить корневую папку маны (отдельная для каждого сервера)
+     * Получить папку мира с маной игроков
      */
-    private static File getManaRootDir() {
-        // Используем имя сервера или worldname как идентификатор
-        // Это гарантирует что разные серверы имеют разные папки
-        File worldDir = new File(".");
-        String serverName = System.getProperty("server.name", "default");
+    private static File getManaWorldDir(ServerPlayer player) {
+        // Получаем имя мира (папки сохранений)
+        String worldName = player.getServer().getWorldData().getLevelName();
 
-        File manaDir = new File(worldDir, "mana_data_" + serverName);
+        // Создаём папку: mana_data/<worldname>/
+        File manaDir = new File("mana_data", worldName);
         if (!manaDir.exists()) {
             manaDir.mkdirs();
         }
@@ -33,22 +33,15 @@ public class ManaPersistence {
     }
 
     /**
-     * Получить путь к файлу маны игрока (с учётом мира)
+     * Получить файл маны игрока (без разделения по измерениям)
      */
     private static File getManaFile(UUID playerUUID, ServerPlayer player) {
-        String dimensionName = player.serverLevel().dimension().location().toString()
-                .replace(":", "_");
-
-        File dimensionDir = new File(getManaRootDir(), dimensionName);
-        if (!dimensionDir.exists()) {
-            dimensionDir.mkdirs();
-        }
-
-        return new File(dimensionDir, playerUUID + ".json");
+        File worldDir = getManaWorldDir(player);
+        return new File(worldDir, playerUUID + ".json");
     }
 
     /**
-     * Сохранить ману в файл
+     * Сохранить ману в файл мира
      */
     public static void saveMana(UUID playerUUID, ManaData mana, ServerPlayer player) {
         try {
@@ -57,32 +50,4 @@ public class ManaPersistence {
             json.addProperty("currentMana", mana.getCurrentMana());
             json.addProperty("maxMana", mana.getMaxMana());
 
-            File file = getManaFile(playerUUID, player);
-            Files.write(file.toPath(), GSON.toJson(json).getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Загрузить ману из файла
-     */
-    public static void loadMana(UUID playerUUID, ServerPlayer player) {
-        try {
-            File file = getManaFile(playerUUID, player);
-            if (file.exists()) {
-                String content = new String(Files.readAllBytes(file.toPath()));
-                JsonObject json = GSON.fromJson(content, JsonObject.class);
-
-                int currentMana = json.get("currentMana").getAsInt();
-                int maxMana = json.get("maxMana").getAsInt();
-
-                ManaData mana = ManaManager.getMana(playerUUID);
-                mana.setCurrentMana(currentMana);
-                mana.setMaxMana(maxMana);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
+            File file = getManaFile(playerUUID
