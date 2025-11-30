@@ -21,10 +21,7 @@ public class ManaPersistence {
      * Получить папку мира с маной игроков
      */
     private static File getManaWorldDir(ServerPlayer player) {
-        // Получаем имя мира (папки сохранений)
         String worldName = player.getServer().getWorldData().getLevelName();
-
-        // Создаём папку: mana_data/<worldname>/
         File manaDir = new File("mana_data", worldName);
         if (!manaDir.exists()) {
             manaDir.mkdirs();
@@ -33,7 +30,7 @@ public class ManaPersistence {
     }
 
     /**
-     * Получить файл маны игрока (без разделения по измерениям)
+     * Получить файл маны игрока
      */
     private static File getManaFile(UUID playerUUID, ServerPlayer player) {
         File worldDir = getManaWorldDir(player);
@@ -50,4 +47,32 @@ public class ManaPersistence {
             json.addProperty("currentMana", mana.getCurrentMana());
             json.addProperty("maxMana", mana.getMaxMana());
 
-            File file = getManaFile(playerUUID
+            File file = getManaFile(playerUUID, player);
+            Files.write(file.toPath(), GSON.toJson(json).getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Загрузить ману из файла мира
+     */
+    public static void loadMana(UUID playerUUID, ServerPlayer player) {
+        try {
+            File file = getManaFile(playerUUID, player);
+            if (file.exists()) {
+                String content = new String(Files.readAllBytes(file.toPath()));
+                JsonObject json = GSON.fromJson(content, JsonObject.class);
+
+                int currentMana = json.get("currentMana").getAsInt();
+                int maxMana = json.get("maxMana").getAsInt();
+
+                ManaData mana = ManaManager.getMana(playerUUID);
+                mana.setCurrentMana(currentMana);
+                mana.setMaxMana(maxMana);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
