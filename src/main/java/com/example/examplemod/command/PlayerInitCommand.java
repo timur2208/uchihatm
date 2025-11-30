@@ -20,7 +20,6 @@ public class PlayerInitCommand {
         dispatcher.register(
                 Commands.literal("uchihatm")
                         .then(Commands.literal("init")
-                                // /uchihatm init <игрок>
                                 .then(Commands.argument("player", EntityArgument.player())
                                         .executes(context -> {
                                             ServerPlayer targetPlayer = EntityArgument.getPlayer(context, "player");
@@ -29,8 +28,8 @@ public class PlayerInitCommand {
                                             // Инициализируем ману (50/100)
                                             ManaManager.getMana(playerUUID).setCurrentMana(50);
 
-                                            // Сохраняем в файл
-                                            ManaPersistence.saveMana(playerUUID, ManaManager.getMana(playerUUID));
+                                            // Сохраняем в файл ЭТОГО МИРА
+                                            ManaPersistence.saveMana(playerUUID, ManaManager.getMana(playerUUID), targetPlayer);
 
                                             // Сообщение администратору
                                             context.getSource().sendSuccess(

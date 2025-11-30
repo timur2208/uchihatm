@@ -37,7 +37,7 @@ public class ManaCommand {
                                                     int value = IntegerArgumentType.getInteger(context, "value");
                                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                                     ManaManager.getMana(player.getUUID()).setCurrentMana(value);
-                                                    ManaPersistence.saveMana(player.getUUID(), ManaManager.getMana(player.getUUID()));
+                                                    ManaPersistence.saveMana(player.getUUID(), ManaManager.getMana(player.getUUID()), player);
                                                     int current = ManaManager.getCurrentMana(player.getUUID());
                                                     int max = ManaManager.getMaxMana(player.getUUID());
                                                     context.getSource().sendSuccess(
@@ -55,7 +55,7 @@ public class ManaCommand {
                                                     int value = IntegerArgumentType.getInteger(context, "value");
                                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                                     ManaManager.addMana(player.getUUID(), value);
-                                                    ManaPersistence.saveMana(player.getUUID(), ManaManager.getMana(player.getUUID()));
+                                                    ManaPersistence.saveMana(player.getUUID(), ManaManager.getMana(player.getUUID()), player);
                                                     int current = ManaManager.getCurrentMana(player.getUUID());
                                                     int max = ManaManager.getMaxMana(player.getUUID());
                                                     context.getSource().sendSuccess(
