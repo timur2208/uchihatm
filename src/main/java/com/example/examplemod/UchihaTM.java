@@ -54,16 +54,16 @@ public class UchihaTM {
             .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
 
     // Креатив таб
+    // Креатив таб
     public static final DeferredHolder EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.uchihatm"))
             .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> new ItemStack(EXAMPLE_ITEM.value()))
+            .icon(() -> EXAMPLE_ITEM.asItem().getDefaultInstance())
             .displayItems((parameters, output) -> {
-                output.accept(EXAMPLE_ITEM.value());
+                output.accept(EXAMPLE_ITEM.asItem());
             }).build());
 
-    public UchihaTM(IEventBus modEventBus, ModContainer modContainer) {
-        // Регистраторы
+    // Регистраторы
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
