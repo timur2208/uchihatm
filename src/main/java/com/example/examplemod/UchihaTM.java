@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 
 import com.example.examplemod.command.ManaCommand;
 import com.example.examplemod.command.PlayerInitCommand;
+import com.example.examplemod.command.PlayerMaxManaCommand;
 import com.example.examplemod.mana.ManaEvents;
 import com.mojang.logging.LogUtils;
 
@@ -11,20 +12,17 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -44,19 +42,27 @@ public class UchihaTM {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
     public static final DeferredRegister CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
-    public static final DeferredBlock EXAMPLE_BLOCK = BLOCKS.registerSimpleBlock("example_block", BlockBehaviour.Properties.of().mapColor(MapColor.STONE));
+    public static final DeferredBlock EXAMPLE_BLOCK = BLOCKS.registerSimpleBlock(
+            "example_block",
+            BlockBehaviour.Properties.of().mapColor(MapColor.STONE)
+    );
     public static final DeferredItem EXAMPLE_BLOCK_ITEM = ITEMS.registerSimpleBlockItem("example_block", EXAMPLE_BLOCK);
 
-    public static final DeferredItem EXAMPLE_ITEM = ITEMS.registerSimpleItem("example_item", new Item.Properties().food(new FoodProperties.Builder()
-            .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
+    public static final DeferredItem EXAMPLE_ITEM = ITEMS.registerSimpleItem(
+            "example_item",
+            new Item.Properties().food(new FoodProperties.Builder()
+                    .alwaysEdible().nutrition(1).saturationModifier(2f).build())
+    );
 
-    public static final DeferredHolder EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.uchihatm"))
-            .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> EXAMPLE_ITEM.asItem().getDefaultInstance())
-            .displayItems((parameters, output) -> {
-                output.accept(EXAMPLE_ITEM.asItem());
-            }).build());
+    public static final DeferredHolder EXAMPLE_TAB = CREATIVE_MODE_TABS.register(
+            "example_tab",
+            () -> CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.uchihatm"))
+                    .withTabsBefore(CreativeModeTabs.COMBAT)
+                    .icon(() -> EXAMPLE_ITEM.asItem().getDefaultInstance())
+                    .displayItems((parameters, output) -> output.accept(EXAMPLE_ITEM.asItem()))
+                    .build()
+    );
 
     public UchihaTM(IEventBus modEventBus, ModContainer modContainer) {
         BLOCKS.register(modEventBus);
@@ -90,6 +96,7 @@ public class UchihaTM {
     private void registerCommands(RegisterCommandsEvent event) {
         ManaCommand.register(event.getDispatcher());
         PlayerInitCommand.register(event.getDispatcher());
+        PlayerMaxManaCommand.register(event.getDispatcher());
         LOGGER.info("Мана-команды зарегистрированы");
     }
 
