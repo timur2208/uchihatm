@@ -19,6 +19,17 @@ public class ManaHUD {
     private static final int PADDING_X = 8;
     private static final int PADDING_Y = 8;
 
+    // Флаг: включён ли Шаринган у локального игрока (клиентский)
+    private static boolean sharinganActive = false;
+
+    public static void toggleSharingan() {
+        sharinganActive = !sharinganActive;
+    }
+
+    public static boolean isSharinganActive() {
+        return sharinganActive;
+    }
+
     @SubscribeEvent
     public static void onRenderGuiLayer(RenderGuiLayerEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
@@ -45,9 +56,10 @@ public class ManaHUD {
         // Заполненная часть с градиентом
         drawManaBar(gg, x, y, current, max);
 
-        // Текст справа от полосы
+        // Цвет текста: белый или красный при активном Шарингане
+        int textColor = sharinganActive ? 0xFFFF4040 : 0xFFEFEFEF;
         String text = "Мана: " + current + "/" + max;
-        gg.drawString(mc.font, text, x + BAR_WIDTH + 6, y + 2, 0xFFEFEFEF, false);
+        gg.drawString(mc.font, text, x + BAR_WIDTH + 6, y + 2, textColor, false);
     }
 
     private static void drawBackground(GuiGraphics gg, int x, int y) {
@@ -56,43 +68,30 @@ public class ManaHUD {
         int x1 = x + BAR_WIDTH + 2;
         int y1 = y + BAR_HEIGHT + 2;
 
-        // Тёмный полупрозрачный фон
         gg.fill(x0, y0, x1, y1, 0xAA000000);
-
-        // Внутренний фон полосы (почти чёрный)
         gg.fill(x, y, x + BAR_WIDTH, y + BAR_HEIGHT, 0xFF151515);
 
-        // Тонкая рамка
         int borderColor = 0xFF551111;
-        // Верх
         gg.fill(x0, y0, x1, y0 + 1, borderColor);
-        // Низ
         gg.fill(x0, y1 - 1, x1, y1, borderColor);
-        // Лево
         gg.fill(x0, y0, x0 + 1, y1, borderColor);
-        // Право
         gg.fill(x1 - 1, y0, x1, y1, borderColor);
     }
 
     private static void drawManaBar(GuiGraphics gg, int x, int y, int current, int max) {
-        if (max <= 0) {
-            return;
-        }
+        if (max <= 0) return;
 
         float perc = Mth.clamp((float) current / max, 0f, 1f);
         int filledHeight = (int) (BAR_HEIGHT * perc);
-
         int topFilled = y + BAR_HEIGHT - filledHeight;
 
-        // Рисуем по строкам, от низа к верху, меняя цвет (градиент бордовый → красный)
         for (int i = 0; i < filledHeight; i++) {
-            float t = (float) i / Math.max(1, filledHeight - 1); // 0..1
+            float t = (float) i / Math.max(1, filledHeight - 1);
             int color = interpolateBordoToRed(t);
             int yLine = topFilled + i;
             gg.fill(x + 1, yLine, x + BAR_WIDTH - 1, yLine + 1, color);
         }
 
-        // Лёгкий "глянец" слева, чтобы выглядело объёмнее
         if (filledHeight > 0) {
             int glossTop = topFilled;
             int glossBottom = y + BAR_HEIGHT;
@@ -100,26 +99,12 @@ public class ManaHUD {
         }
     }
 
-    /**
-     * Градиент от тёмно-бордового к ярко-красному.
-     * t = 0   → тёмный бордо
-     * t = 1   → яркий красный с лёгким свечением
-     */
     private static int interpolateBordoToRed(float t) {
         t = Mth.clamp(t, 0f, 1f);
 
-        // Нижняя часть более бордовая, верхняя более яркая
-        int startR = 90;
-        int startG = 0;
-        int startB = 10;
-
-        int midR = 160;
-        int midG = 10;
-        int midB = 20;
-
-        int endR = 255;
-        int endG = 40;
-        int endB = 40;
+        int startR = 90,  startG = 0,  startB = 10;
+        int midR   = 160, midG   = 10, midB   = 20;
+        int endR   = 255, endG   = 40, endB   = 40;
 
         int r, g, b;
         if (t < 0.5f) {
