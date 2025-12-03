@@ -16,6 +16,7 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyModifier;
+import net.neoforged.neoforge.client.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
 
 @Mod(value = UchihaTM.MODID, dist = Dist.CLIENT)
@@ -33,16 +34,17 @@ public class UchihaTMClient {
         UchihaTM.LOGGER.info("HELLO FROM CLIENT SETUP");
         UchihaTM.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
 
-        event.registerKeyMapping(
-                SHARINGAN_KEY = new KeyMapping(
-                        "key.uchihatm.sharingan",              // переводной ключ
-                        KeyConflictContext.IN_GAME,
-                        KeyModifier.NONE,
-                        InputConstants.Type.KEYSYM,
-                        GLFW.GLFW_KEY_R,                       // по умолчанию R
-                        "key.categories.uchihatm"              // категория
-                )
-        );
+        event.enqueueWork(() -> {
+            SHARINGAN_KEY = new KeyMapping(
+                    "key.uchihatm.sharingan",
+                    KeyConflictContext.IN_GAME,
+                    KeyModifier.NONE,
+                    InputConstants.Type.KEYSYM,
+                    GLFW.GLFW_KEY_R,
+                    "key.categories.uchihatm"
+            );
+            ClientRegistry.registerKeyBinding(SHARINGAN_KEY);
+        });
     }
 
     @SubscribeEvent
