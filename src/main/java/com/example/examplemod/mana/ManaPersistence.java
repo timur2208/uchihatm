@@ -9,55 +9,49 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.LevelResource;
 
-/**
- * Сохранение и загрузка маны в JSON файл
- */
 public class ManaPersistence {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     /**
-     * Получить уникальный хеш сервера
+     * Уникальный ID сервера по абсолютному пути level.dat
      */
-    private static String getServerHash(ServerPlayer player) {
+    private static String getServerId(ServerPlayer player) {
         try {
-            File levelDat = player.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT)
-                    .resolve("level.dat").toFile();
+            File levelDat = player.getServer()
+                    .getWorldPath(LevelResource.ROOT)
+                    .resolve("level.dat")
+                    .toFile();
 
-            if (levelDat.exists()) {
-                String absolutePath = levelDat.getAbsolutePath();
-                return String.format("%08x", absolutePath.hashCode());
-            }
+            String path = levelDat.getAbsolutePath();
+            // Хеш пути как стабильный ID
+            return Integer.toHexString(path.hashCode());
         } catch (Exception e) {
             e.printStackTrace();
+            // Фоллбек — но это уже крайний случай
+            return player.getServer().getWorldData().getLevelName();
         }
-
-        return player.getServer().getWorldData().getLevelName();
     }
 
     /**
-     * Получить папку сервера с маной игроков
+     * Папка маны для конкретного сервера
+     * Пример: mana_data/3fa4c9ab/
      */
     private static File getManaServerDir(ServerPlayer player) {
-        String serverHash = getServerHash(player);
-        File manaDir = new File("mana_data", serverHash);
-        if (!manaDir.exists()) {
-            manaDir.mkdirs();
+        String serverId = getServerId(player);
+        File dir = new File("mana_data", serverId);
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
-        return manaDir;
+        return dir;
     }
 
-    /**
-     * Получить файл маны игрока
-     */
     private static File getManaFile(UUID playerUUID, ServerPlayer player) {
         File serverDir = getManaServerDir(player);
         return new File(serverDir, playerUUID + ".json");
     }
 
-    /**
-     * Сохранить ману в файл сервера
-     */
     public static void saveMana(UUID playerUUID, ManaData mana, ServerPlayer player) {
         try {
             JsonObject json = new JsonObject();
@@ -73,27 +67,28 @@ public class ManaPersistence {
         }
     }
 
-    /**
-     * Загрузить ману из файла сервера
-     */
     public static void loadMana(UUID playerUUID, ServerPlayer player) {
         try {
             File file = getManaFile(playerUUID, player);
-            if (file.exists()) {
-                String content = new String(Files.readAllBytes(file.toPath()));
-                JsonObject json = GSON.fromJson(content, JsonObject.class);
-
-                int currentMana = json.get("currentMana").getAsInt();
-                int maxMana = json.get("maxMana").getAsInt();
-                boolean initialized = json.has("initialized") && json.get("initialized").getAsBoolean();
-
-                if (initialized) {
-                    ManaManager.initializePlayer(playerUUID);
-                    ManaData mana = ManaManager.getMana(playerUUID);
-                    mana.setCurrentMana(currentMana);
-                    mana.setMaxMana(maxMana);
-                }
+            if (!file.exists()) {
+                return;
             }
+
+            String content = new String(Files.readAllBytes(file.toPath()));
+            JsonObject json = GSON.fromJson(content, JsonObject.class);
+
+            boolean initialized = json.has("initialized") && json.get("initialized").getAsBoolean();
+            if (!initialized) {
+                return;
+            }
+
+            int currentMana = json.get("currentMana").getAsInt();
+            int maxMana = json.get("maxMana").getAsInt();
+
+            ManaManager.initializePlayer(playerUUID);
+            ManaData mana = ManaManager.getMana(playerUUID);
+            mana.setMaxMana(maxMana);
+            mana.setCurrentMana(currentMana);
         } catch (IOException e) {
             e.printStackTrace();
         }
