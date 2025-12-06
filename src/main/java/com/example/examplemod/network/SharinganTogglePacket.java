@@ -43,6 +43,7 @@ public class SharinganTogglePacket implements CustomPacketPayload {
             ManaManager.setSharingan(uuid, now);
 
             if (now) {
+                // Только скорость, без glow
                 MobEffectInstance speed = new MobEffectInstance(
                         MobEffects.MOVEMENT_SPEED,
                         20 * 60 * 60,
@@ -52,19 +53,8 @@ public class SharinganTogglePacket implements CustomPacketPayload {
                         true
                 );
                 player.addEffect(speed);
-
-                MobEffectInstance glowing = new MobEffectInstance(
-                        MobEffects.GLOWING,
-                        20 * 60 * 60,
-                        0,
-                        false,
-                        false,
-                        false
-                );
-                player.addEffect(glowing);
             } else {
                 player.removeEffect(MobEffects.MOVEMENT_SPEED);
-                player.removeEffect(MobEffects.GLOWING);
             }
         });
     }
