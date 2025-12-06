@@ -42,8 +42,13 @@ public class SharinganTogglePacket implements CustomPacketPayload {
             boolean now = !ManaManager.isSharinganActive(uuid);
             ManaManager.setSharingan(uuid, now);
 
+            // Отправляем пакет клиенту с новым состоянием
+            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(
+                    new SharinganSyncPacket(now),
+                    player
+            );
+
             if (now) {
-                // Только скорость, без glow
                 MobEffectInstance speed = new MobEffectInstance(
                         MobEffects.MOVEMENT_SPEED,
                         20 * 60 * 60,

@@ -25,6 +25,10 @@ public class ManaHUD {
         sharinganActive = !sharinganActive;
     }
 
+    public static void setSharingan(boolean active) {
+        sharinganActive = active;
+    }
+
     public static boolean isSharinganActive() {
         return sharinganActive;
     }

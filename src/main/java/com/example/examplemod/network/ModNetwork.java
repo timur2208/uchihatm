@@ -12,5 +12,10 @@ public class ModNetwork {
                 SharinganTogglePacket.CODEC,
                 (packet, context) -> packet.handle(context)
         );
+        registrar.playToClient(
+                SharinganSyncPacket.TYPE,
+                SharinganSyncPacket.CODEC,
+                (packet, context) -> packet.handle(context)
+        );
     }
 }
