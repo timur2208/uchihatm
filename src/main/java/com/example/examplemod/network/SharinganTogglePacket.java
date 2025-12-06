@@ -17,7 +17,14 @@ public class SharinganTogglePacket implements CustomPacketPayload {
             new Type<>(ResourceLocation.fromNamespaceAndPath(UchihaTM.MODID, "sharingan_toggle"));
 
     public static final StreamCodec<ByteBuf, SharinganTogglePacket> CODEC =
-            StreamCodec.unit(new SharinganTogglePacket());
+            new StreamCodec<ByteBuf, SharinganTogglePacket>() {
+                public SharinganTogglePacket decode(ByteBuf buf) {
+                    return new SharinganTogglePacket();
+                }
+
+                public void encode(ByteBuf buf, SharinganTogglePacket msg) {
+                }
+            };
 
     public SharinganTogglePacket() {}
 
