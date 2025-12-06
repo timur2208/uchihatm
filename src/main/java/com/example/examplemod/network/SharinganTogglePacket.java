@@ -1,29 +1,37 @@
 package com.example.examplemod.network;
 
+import com.example.examplemod.UchihaTM;
 import com.example.examplemod.mana.ManaManager;
-import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class SharinganTogglePacket {
+public class SharinganTogglePacket implements CustomPacketPayload {
+
+    public static final Type<SharinganTogglePacket> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(UchihaTM.MODID, "sharingan_toggle"));
+
+    public static final StreamCodec<ByteBuf, SharinganTogglePacket> CODEC =
+            StreamCodec.unit(new SharinganTogglePacket());
 
     public SharinganTogglePacket() {}
 
-    public static SharinganTogglePacket decode(FriendlyByteBuf buf) {
-        return new SharinganTogglePacket();
-    }
-
-    public void encode(FriendlyByteBuf buf) {
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
-            ServerPlayer player = context.getPlayer();
-            if (!(player instanceof ServerPlayer sp)) return;
+            ServerPlayer player = (ServerPlayer) context.player();
+            if (player == null) return;
 
-            var uuid = sp.getUUID();
+            var uuid = player.getUUID();
             boolean now = !ManaManager.isSharinganActive(uuid);
             ManaManager.setSharingan(uuid, now);
 
@@ -36,7 +44,7 @@ public class SharinganTogglePacket {
                         false,
                         true
                 );
-                sp.addEffect(speed);
+                player.addEffect(speed);
 
                 MobEffectInstance glowing = new MobEffectInstance(
                         MobEffects.GLOWING,
@@ -46,10 +54,10 @@ public class SharinganTogglePacket {
                         false,
                         false
                 );
-                sp.addEffect(glowing);
+                player.addEffect(glowing);
             } else {
-                sp.removeEffect(MobEffects.MOVEMENT_SPEED);
-                sp.removeEffect(MobEffects.GLOWING);
+                player.removeEffect(MobEffects.MOVEMENT_SPEED);
+                player.removeEffect(MobEffects.GLOWING);
             }
         });
     }

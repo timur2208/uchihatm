@@ -36,7 +36,7 @@ public class UchihaTMClient {
 
         while (ClientKeyMappings.SHARINGAN_KEY.consumeClick()) {
             PacketDistributor.sendToServer(
-                    new com.example.examplemod.network.SharinganTogglePacketPayload()
+                    new com.example.examplemod.network.SharinganTogglePacket()
             );
             ManaHUD.toggleSharingan();
         }
