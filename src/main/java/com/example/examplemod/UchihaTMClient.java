@@ -34,7 +34,7 @@ public class UchihaTMClient {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || ClientKeyMappings.SHARINGAN_KEY == null) return;
 
-        while (ClientKeyMappings.SHARINGAN_KEY.consumeClick()) {
+        if (ClientKeyMappings.SHARINGAN_KEY.consumeClick()) {
             PacketDistributor.sendToServer(
                     new com.example.examplemod.network.SharinganTogglePacket()
             );
