@@ -1,32 +1,59 @@
-public void handle(IPayloadContext context) {
-    context.enqueueWork(() -> {
-        ServerPlayer player = (ServerPlayer) context.player();
-        if (player == null) return;
+package com.example.examplemod.network;
 
-        var uuid = player.getUUID();
-        boolean now = !ManaManager.isSharinganActive(uuid);
-        ManaManager.setSharingan(uuid, now);
+import com.example.examplemod.UchihaTM;
+import com.example.examplemod.mana.ManaManager;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-        // Синхронизация флага Шарингана на клиент
-        net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(
-                player,
-                new SharinganSyncPacket(now)
-        );
+public class SharinganTogglePacket implements CustomPacketPayload {
 
-        if (now) {
-            // Включаем только скорость
-            MobEffectInstance speed = new MobEffectInstance(
-                    MobEffects.MOVEMENT_SPEED,
-                    20 * 60 * 60,
-                    0,
-                    false,
-                    false,
-                    true
+    public static final Type<SharinganTogglePacket> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(UchihaTM.MODID, "sharingan_toggle"));
+
+    public static final StreamCodec<ByteBuf, SharinganTogglePacket> CODEC =
+            StreamCodec.unit(new SharinganTogglePacket());
+
+    public SharinganTogglePacket() {}
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
+    public void handle(IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ServerPlayer player = (ServerPlayer) context.player();
+            if (player == null) return;
+
+            var uuid = player.getUUID();
+            boolean now = !ManaManager.isSharinganActive(uuid);
+            ManaManager.setSharingan(uuid, now);
+
+            // Синхронизация флага Шарингана на клиент
+            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(
+                    player,
+                    new SharinganSyncPacket(now)
             );
-            player.addEffect(speed);
-        } else {
-            // Выключаем скорость
-            player.removeEffect(MobEffects.MOVEMENT_SPEED);
-        }
-    });
-}
+
+            if (now) {
+                // Включаем только скорость
+                MobEffectInstance speed = new MobEffectInstance(
+                        MobEffects.MOVEMENT_SPEED,
+                        20 * 60 * 60,
+                        0,
+                        false,
+                        false,
+                        true
+                );
+                player.addEffect(speed);
+            } else {
+                // Выключаем скорость
+                player.removeEffect(MobEffects.MOVEMENT_SPEED);
+            }
+        });
