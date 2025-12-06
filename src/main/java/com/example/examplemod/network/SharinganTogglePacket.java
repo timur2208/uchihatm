@@ -57,3 +57,5 @@ public class SharinganTogglePacket implements CustomPacketPayload {
                 player.removeEffect(MobEffects.MOVEMENT_SPEED);
             }
         });
+    }
+}
