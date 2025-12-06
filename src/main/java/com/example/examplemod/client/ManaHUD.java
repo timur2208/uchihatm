@@ -19,7 +19,6 @@ public class ManaHUD {
     private static final int PADDING_X = 8;
     private static final int PADDING_Y = 8;
 
-    // Флаг: включён ли Шаринган у локального игрока (клиентский)
     private static boolean sharinganActive = false;
 
     public static void toggleSharingan() {
@@ -41,7 +40,6 @@ public class ManaHUD {
         int current = ManaManager.getCurrentMana(player.getUUID());
         int max = ManaManager.getMaxMana(player.getUUID());
 
-        // Игрок не инициализирован
         if (current == 0 && max == 0) {
             return;
         }
@@ -50,13 +48,9 @@ public class ManaHUD {
         int x = PADDING_X;
         int y = PADDING_Y;
 
-        // Фон + рамка
         drawBackground(gg, x, y);
-
-        // Заполненная часть с градиентом
         drawManaBar(gg, x, y, current, max);
 
-        // Цвет текста: белый или красный при активном Шарингане
         int textColor = sharinganActive ? 0xFFFF4040 : 0xFFEFEFEF;
         String text = "Мана: " + current + "/" + max;
         gg.drawString(mc.font, text, x + BAR_WIDTH + 6, y + 2, textColor, false);
@@ -79,7 +73,9 @@ public class ManaHUD {
     }
 
     private static void drawManaBar(GuiGraphics gg, int x, int y, int current, int max) {
-        if (max <= 0) return;
+        if (max <= 0) {
+            return;
+        }
 
         float perc = Mth.clamp((float) current / max, 0f, 1f);
         int filledHeight = (int) (BAR_HEIGHT * perc);

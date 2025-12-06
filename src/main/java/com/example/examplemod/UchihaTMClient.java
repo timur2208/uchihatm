@@ -31,8 +31,7 @@ public class UchihaTMClient {
     @SubscribeEvent
     public static void onKeyInput(InputEvent.Key event) {
         Minecraft mc = Minecraft.getInstance();
-        Player player = mc.player;
-        if (player == null || ClientKeyMappings.SHARINGAN_KEY == null) return;
+        if (mc.player == null || ClientKeyMappings.SHARINGAN_KEY == null) return;
 
         while (ClientKeyMappings.SHARINGAN_KEY.consumeClick()) {
             ManaHUD.toggleSharingan();
