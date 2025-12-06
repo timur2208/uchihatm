@@ -6,6 +6,7 @@ import com.example.examplemod.command.ManaCommand;
 import com.example.examplemod.command.PlayerInitCommand;
 import com.example.examplemod.command.PlayerMaxManaCommand;
 import com.example.examplemod.mana.ManaEvents;
+import com.example.examplemod.network.ModNetwork;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -79,6 +80,7 @@ public class UchihaTM {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
+        ModNetwork.register();
         LOGGER.info("HELLO FROM COMMON SETUP");
         if (Config.LOG_DIRT_BLOCK.getAsBoolean()) {
             LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));

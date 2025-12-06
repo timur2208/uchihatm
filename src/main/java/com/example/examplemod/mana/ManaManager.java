@@ -72,5 +72,16 @@ public class ManaManager {
     public static void removePlayer(UUID playerUUID) {
         playerMana.remove(playerUUID);
         playerInitialized.remove(playerUUID);
+        playerSharingan.remove(playerUUID);
+    }
+
+    private static final Map<UUID, Boolean> playerSharingan = new HashMap<>();
+
+    public static boolean isSharinganActive(UUID uuid) {
+        return playerSharingan.getOrDefault(uuid, false);
+    }
+
+    public static void setSharingan(UUID uuid, boolean active) {
+        playerSharingan.put(uuid, active);
     }
 }
