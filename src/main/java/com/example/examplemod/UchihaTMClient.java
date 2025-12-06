@@ -13,6 +13,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 @Mod(value = UchihaTM.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = UchihaTM.MODID, value = Dist.CLIENT)
@@ -34,10 +35,9 @@ public class UchihaTMClient {
         if (mc.player == null || ClientKeyMappings.SHARINGAN_KEY == null) return;
 
         while (ClientKeyMappings.SHARINGAN_KEY.consumeClick()) {
-            // Отправляем пакет на сервер
-            com.example.examplemod.network.ModNetwork.CHANNEL
-                    .sendToServer(new com.example.examplemod.network.SharinganTogglePacket());
-            // Меняем цвет текста локально
+            PacketDistributor.sendToServer(
+                    new com.example.examplemod.network.SharinganTogglePacketPayload()
+            );
             ManaHUD.toggleSharingan();
         }
     }

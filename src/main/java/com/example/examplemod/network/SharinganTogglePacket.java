@@ -5,9 +5,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.neoforged.neoforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class SharinganTogglePacket {
 
@@ -20,18 +18,16 @@ public class SharinganTogglePacket {
     public void encode(FriendlyByteBuf buf) {
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> ctxSupplier) {
-        NetworkEvent.Context ctx = ctxSupplier.get();
-        ctx.enqueueWork(() -> {
-            ServerPlayer player = ctx.getSender();
-            if (player == null) return;
+    public void handle(IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ServerPlayer player = context.getPlayer();
+            if (!(player instanceof ServerPlayer sp)) return;
 
-            var uuid = player.getUUID();
+            var uuid = sp.getUUID();
             boolean now = !ManaManager.isSharinganActive(uuid);
             ManaManager.setSharingan(uuid, now);
 
             if (now) {
-                // Включаем скорость I
                 MobEffectInstance speed = new MobEffectInstance(
                         MobEffects.MOVEMENT_SPEED,
                         20 * 60 * 60,
@@ -40,9 +36,8 @@ public class SharinganTogglePacket {
                         false,
                         true
                 );
-                player.addEffect(speed);
+                sp.addEffect(speed);
 
-                // Включаем GLOWING (встроенный эффект подсветки)
                 MobEffectInstance glowing = new MobEffectInstance(
                         MobEffects.GLOWING,
                         20 * 60 * 60,
@@ -51,13 +46,11 @@ public class SharinganTogglePacket {
                         false,
                         false
                 );
-                player.addEffect(glowing);
+                sp.addEffect(glowing);
             } else {
-                // Выключаем оба эффекта
-                player.removeEffect(MobEffects.MOVEMENT_SPEED);
-                player.removeEffect(MobEffects.GLOWING);
+                sp.removeEffect(MobEffects.MOVEMENT_SPEED);
+                sp.removeEffect(MobEffects.GLOWING);
             }
         });
-        return true;
     }
 }
