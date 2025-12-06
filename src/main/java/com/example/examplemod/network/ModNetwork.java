@@ -1,14 +1,14 @@
 package com.example.examplemod.network;
 
 import com.example.examplemod.UchihaTM;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.PlayPayloadHandler;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistration;
 
 public class ModNetwork {
 
-    public static void register(PayloadRegistration registrar) {
+    public static void register(RegisterPayloadHandlersEvent event) {
+        PayloadRegistration registrar = event.registrar(UchihaTM.MODID);
+
         registrar.playToServer(
                 SharinganTogglePacketPayload.TYPE,
                 SharinganTogglePacketPayload.CODEC,

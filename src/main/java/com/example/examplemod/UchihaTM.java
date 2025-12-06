@@ -28,8 +28,8 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.network.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -73,7 +73,7 @@ public class UchihaTM {
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
-        modEventBus.addListener(this::registerPayloads);
+        modEventBus.addListener(ModNetwork::register);
 
         ManaEvents.register();
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
@@ -94,10 +94,6 @@ public class UchihaTM {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(EXAMPLE_BLOCK_ITEM);
         }
-    }
-
-    private void registerPayloads(RegisterPayloadHandlersEvent event) {
-        ModNetwork.register(event.registrar(UchihaTM.MODID));
     }
 
     private void registerCommands(RegisterCommandsEvent event) {

@@ -1,28 +1,48 @@
 package com.example.examplemod.network;
 
-import com.example.examplemod.UchihaTM;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import com.example.examplemod.mana.ManaManager;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class SharinganTogglePacketPayload implements CustomPacketPayload {
+public class SharinganTogglePacket {
 
-    public static final CustomPacketPayload.Type<SharinganTogglePacketPayload> TYPE =
-            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(UchihaTM.MODID, "sharingan_toggle"));
-
-    public static final StreamCodec<ByteBuf, SharinganTogglePacketPayload> CODEC =
-            StreamCodec.unit(new SharinganTogglePacketPayload());
-
-    public SharinganTogglePacketPayload() {}
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
+    public SharinganTogglePacket() {}
 
     public void handle(IPayloadContext context) {
-        new SharinganTogglePacket().handle(context);
+        context.enqueueWork(() -> {
+            ServerPlayer player = (ServerPlayer) context.player();
+            if (player == null) return;
+
+            var uuid = player.getUUID();
+            boolean now = !ManaManager.isSharinganActive(uuid);
+            ManaManager.setSharingan(uuid, now);
+
+            if (now) {
+                MobEffectInstance speed = new MobEffectInstance(
+                        MobEffects.MOVEMENT_SPEED,
+                        20 * 60 * 60,
+                        0,
+                        false,
+                        false,
+                        true
+                );
+                player.addEffect(speed);
+
+                MobEffectInstance glowing = new MobEffectInstance(
+                        MobEffects.GLOWING,
+                        20 * 60 * 60,
+                        0,
+                        false,
+                        false,
+                        false
+                );
+                player.addEffect(glowing);
+            } else {
+                player.removeEffect(MobEffects.MOVEMENT_SPEED);
+                player.removeEffect(MobEffects.GLOWING);
+            }
+        });
     }
 }
