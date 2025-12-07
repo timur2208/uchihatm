@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import com.example.examplemod.command.ManaCommand;
 import com.example.examplemod.command.PlayerInitCommand;
 import com.example.examplemod.command.PlayerMaxManaCommand;
+import com.example.examplemod.command.SharinganCommand;
 import com.example.examplemod.mana.ManaEvents;
-import com.example.examplemod.network.ModNetwork;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,7 +29,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -73,7 +72,6 @@ public class UchihaTM {
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
-        modEventBus.addListener(ModNetwork::register);
 
         ManaEvents.register();
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
@@ -100,6 +98,7 @@ public class UchihaTM {
         ManaCommand.register(event.getDispatcher());
         PlayerInitCommand.register(event.getDispatcher());
         PlayerMaxManaCommand.register(event.getDispatcher());
+        SharinganCommand.register(event.getDispatcher());
         LOGGER.info("Мана-команды зарегистрированы");
     }
 
